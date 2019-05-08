@@ -17,10 +17,8 @@ public class RaymarchCamera : SceneViewFilter
     {
         get
         {
-            if (_raymarchMat || !_shader)
-                return _raymarchMat;
-            _raymarchMat = new Material(_shader) { hideFlags = HideFlags.HideAndDontSave };
-            return _raymarchMat;
+            return _raymarchMat || !_shader 
+                ? _raymarchMat : _raymarchMat = new Material(_shader) { hideFlags = HideFlags.HideAndDontSave };
         }
     }
 
