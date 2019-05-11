@@ -1,4 +1,4 @@
-﻿Shader "PeerPlay/RaymarchShader"
+﻿Shader "PeerPlay/TetrahedronShader"
 {
 	Properties
 	{
@@ -74,13 +74,9 @@
 
 			float DistanceField(float3 p)
 			{
-				float modX = Modulator(p.x, _modInterval.x);
-				float modY = Modulator(p.y, _modInterval.y);
-				float modZ = Modulator(p.z, _modInterval.z);
-				//float ground = CreatePlane(p, float4(0,1,0,0));
+				float plane1 = CreatePlane(p, float4(0, 1, 0, 5));
 				float boxSphere1 = BoxSphere(p);
-
-				return boxSphere1;
+				return Union(plane1, boxSphere1);
 			}
 
 			float3 GetNormal(float3 p)
@@ -157,7 +153,7 @@
 
 			fixed4 RayMarch(float3 ro, float3 rd, float depth)
 			{
-				fixed4 result = fixed4(0,0,0,1);
+				fixed4 result = fixed4(1,1,1,1);
 				const int max_iteration = _MaxIterations;
 				float t = 0; //distance travelled along the ray direction
 
@@ -195,7 +191,7 @@
 				fixed3 col = tex2D(_MainTex, i.uv);
 				float3 rayDirection = normalize(i.ray.xyz);
 				float3 rayOrigin = _WorldSpaceCameraPos;
-				fixed4 result = RayMarch(rayOrigin,rayDirection, depth);
+				fixed4 result = RayMarch(rayOrigin, rayDirection, depth);
 				return fixed4(col * (1.0 - result.w) + result.xyz * result.w,1.0);
 			}
 			ENDCG
