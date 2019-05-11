@@ -149,7 +149,7 @@ MonoBehaviour:
   MaxIterations: 300
   Accuracy: 0.0508
   DirectionalLight: {fileID: 472737465}
-  LightCol: {r: 0.94482756, g: 1, b: 0, a: 0}
+  LightColor: {r: 1, g: 1, b: 1, a: 0}
   LightIntensity: 0.72
   ShadowIntensity: 1.19
   ShadowDistance: {x: 0.1, y: 100}
@@ -159,7 +159,7 @@ MonoBehaviour:
   AoIntensity: 0.271
   MainColor: {r: 1, g: 0, b: 0.93103456, a: 0}
   Sphere1: {x: 0, y: 0, z: 0, w: 4.15}
-  Box: {x: 0, y: 0, z: 0, w: 13.48}
+  Box: {x: 0, y: 0, z: 0, w: 3.1}
   BoxRound: 0.19
   BoxSphereSmooth: 0.51
   Sphere2: {x: 0, y: 0, z: 0, w: 2.29}

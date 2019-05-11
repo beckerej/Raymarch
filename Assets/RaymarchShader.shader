@@ -114,9 +114,7 @@
 				{
 					float h = DistanceField(ro + rd * t);
 					if (h < 0.001)
-					{
 						return 0.0;
-					}
 					result = min(result, k*h / t);
 					t += h;
 				}

@@ -1,62 +1,66 @@
 ﻿using System.Linq;
+using UnityEditor;
 using UnityEngine;
 #if UNITY_EDITOR
-using UnityEditor;
+
 #endif
 
-public class SceneViewFilter : MonoBehaviour
+namespace Assets
 {
+    public class SceneViewFilter : MonoBehaviour
+    {
 #if UNITY_EDITOR
-    bool hasChanged = false;
+        private bool _hasChanged;
 
-    public virtual void OnValidate()
-    {
-        hasChanged = true;
-    }
+        public virtual void OnValidate()
+        {
+            _hasChanged = true;
+        }
 
-    static SceneViewFilter()
-    {
-        SceneView.onSceneGUIDelegate += CheckMe;
-    }
+        static SceneViewFilter()
+        {
+            SceneView.onSceneGUIDelegate += Check;
+        }
 
-    static void CheckMe(SceneView sv)
-    {
-        if (Event.current.type != EventType.Layout || !Camera.main)
-            return;
+        private static void Check(SceneView sv)
+        {
+            if (Event.current.type != EventType.Layout || !Camera.main)
+                return;
         
-        var cameraFilters = Camera.main.GetComponents<SceneViewFilter>();
-        var sceneFilters = sv.camera.GetComponents<SceneViewFilter>();
+            var cameraFilters = Camera.main.GetComponents<SceneViewFilter>();
+            var sceneFilters = sv.camera.GetComponents<SceneViewFilter>();
 
-        if (cameraFilters.Length != sceneFilters.Length)
-        {
-            Recreate(sv);
-            return;
-        }
-        if (cameraFilters.Where((t, i) => t.GetType() != sceneFilters[i].GetType()).Any())
-        {
-            Recreate(sv);
-            return;
-        }
-
-        for (var i = 0; i < cameraFilters.Length; i++)
-            if (cameraFilters[i].hasChanged || sceneFilters[i].enabled != cameraFilters[i].enabled)
+            if (cameraFilters.Length != sceneFilters.Length)
             {
-                EditorUtility.CopySerialized(cameraFilters[i], sceneFilters[i]);
-                cameraFilters[i].hasChanged = false;
+                Recreate(sv);
+                return;
             }
-    }
+            if (cameraFilters.Where((t, i) => t.GetType() != sceneFilters[i].GetType()).Any())
+            {
+                Recreate(sv);
+                return;
+            }
 
-    private static void Recreate(SceneView sv)
-    {
-        SceneViewFilter filter;
-        filter = sv.camera.GetComponent<SceneViewFilter>();
-        DestroyImmediate(filter);
-
-        foreach (var f in Camera.main.GetComponents<SceneViewFilter>())
-        {
-            var newFilter = sv.camera.gameObject.AddComponent(f.GetType()) as SceneViewFilter;
-            EditorUtility.CopySerialized(f, newFilter);
+            for (var i = 0; i < cameraFilters.Length; i++)
+            {
+                if (!cameraFilters[i]._hasChanged && sceneFilters[i].enabled == cameraFilters[i].enabled)
+                    continue;
+                EditorUtility.CopySerialized(cameraFilters[i], sceneFilters[i]);
+                cameraFilters[i]._hasChanged = false;
+            }
         }
-    }
+
+        private static void Recreate(SceneView sv)
+        {
+            var filter = sv.camera.GetComponent<SceneViewFilter>();
+            DestroyImmediate(filter);
+
+            foreach (var f in Camera.main.GetComponents<SceneViewFilter>())
+            {
+                var newFilter = sv.camera.gameObject.AddComponent(f.GetType()) as SceneViewFilter;
+                EditorUtility.CopySerialized(f, newFilter);
+            }
+        }
 #endif
+    }
 }
