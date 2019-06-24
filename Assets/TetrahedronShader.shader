@@ -35,6 +35,8 @@
 			uniform float _ShadowIntensity, _ShadowPenumbra;
 			uniform float _AoStepsize, _AoIntensity;
 			uniform int _AoIterations;
+			//uniform float3 TrianglePosition;
+			uniform int _TriangleIterations;
 
 			struct appdata
 			{
@@ -69,14 +71,99 @@
 				float combine1 = SmoothSubtraction(Sphere1, Box1, _boxSphereSmooth);
 				float Sphere2 = CreateSphere(p - _sphere2.xyz, _sphere2.w);
 				float combine2 = SmoothIntersection(Sphere2, combine1, _sphereIntersectSmooth);
-				return combine2;
+				return combine1;
+			}
+
+			float SierpinskiTriangle(float3 p)
+			{
+				float3 a1 = float3(1, 1, 1);
+				float3 a2 = float3(-1, -1, 1);
+				float3 a3 = float3(1, -1, -1);
+				float3 a4 = float3(-1, 1, -1);
+				float Scale = 2.0;
+				float3 c;
+				int n = 0;
+				float dist, d;
+				while (n < 1) {
+					c = a1; 
+					dist = length(p - a1);
+					d = length(p - a2); 
+					if (d < dist) { 
+						c = a2; 
+						dist = d; 
+					}
+					d = length(p - a3); 
+					if (d < dist) { 
+						c = a3; 
+						dist = d; 
+					}
+					d = length(p - a4); 
+					if (d < dist) { 
+						c = a4; 
+						dist = d; 
+					}
+					p = Scale * p - c * (Scale - 1.0);
+					n++;
+				}
+
+				return length(p) * pow(Scale, float(-n));
+			}
+
+			float SierpinskiTriangle2(float3 p) 
+			{
+				float Scale = 2.0;
+				float3 Offset = float3(1, 1, 1);
+				int n = 0;
+				while (n < 1) {
+					if (p.x + p.y < 0) 
+						p.xy = -p.yx; // fold 1
+					if (p.x + p.z < 0) 
+						p.xz = -p.zx; // fold 2
+					if (p.y + p.z < 0) 
+						p.zy = -p.yz; // fold 3	
+					p = p * Scale - Offset * (Scale - 1.0);
+					n++;
+				}
+				return (length(p)) * pow(Scale, -float(n));
+			}
+
+			float sierpinski3d(float3 p)
+			{
+				float scale = 2.0;
+				float offset = 1.5;
+				float x1, y1, z1;
+				for (int n = 0; n < _TriangleIterations; n++)
+				{
+					p.xy = (p.x + p.y < 0.0) ? -p.yx : p.xy;
+					p.xz = (p.x + p.z < 0.0) ? -p.zx : p.xz;
+					p.zy = (p.z + p.y < 0.0) ? -p.yz : p.zy;
+
+					p = scale * p - offset * (scale - 1.0);
+				}
+
+				return length(p) * pow(scale, -float(_TriangleIterations));
+			}
+
+			float sdOctahedron(float3 p, float s)
+			{
+				p = abs(p);
+				float m = p.x + p.y + p.z - s;
+				float3 q;
+				if (3.0*p.x < m) q = p.xyz;
+				else if (3.0*p.y < m) q = p.yzx;
+				else if (3.0*p.z < m) q = p.zxy;
+				else return m * 0.57735027;
+
+				float k = clamp(0.5*(q.z - q.y + s), 0.0, s);
+				return length(float3(q.x, q.y - s + k, q.z - k));
 			}
 
 			float DistanceField(float3 p)
 			{
-				float plane1 = CreatePlane(p, float4(0, 1, 0, 5));
-				float boxSphere1 = BoxSphere(p);
-				return Union(plane1, boxSphere1);
+				//float boxSphere1 = BoxSphere(p);
+				float test = SierpinskiTriangle2(p);
+
+				return sierpinski3d(p);
 			}
 
 			float3 GetNormal(float3 p)
@@ -95,9 +182,7 @@
 				{
 					float h = DistanceField(ro + rd * t);
 					if (h < 0.001)
-					{
 						return 0.0;
-					}
 					t += h;
 				}
 				return 1.0;
@@ -110,9 +195,7 @@
 				{
 					float h = DistanceField(ro + rd * t);
 					if (h < 0.001)
-					{
 						return 0.0;
-					}
 					result = min(result, k*h / t);
 					t += h;
 				}
@@ -173,9 +256,9 @@
 					{
 						//shading!
 						float3 n = GetNormal(p);
-						float3 s = Shading(p,n);
+						//float3 s = Shading(p,n);
 
-						result = fixed4(s,1);
+						result = fixed4(n,1);
 						break;
 					}
 					t += d;

@@ -145,17 +145,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _shader: {fileID: 4800000, guid: 8540fe4468a843248b5cbe92b150f0fe, type: 3}
-  MaxDistance: 1000
+  MaxDistance: 1002.89
   MaxIterations: 300
-  Accuracy: 0.0508
+  Accuracy: 0.1
   DirectionalLight: {fileID: 472737465}
   LightColor: {r: 1, g: 1, b: 1, a: 0}
   LightIntensity: 0.72
-  ShadowIntensity: 1.19
+  ShadowIntensity: 0.92
   ShadowDistance: {x: 0.1, y: 100}
-  ShadowPenumbra: 5.9
-  AoStepsize: 2.43
-  AoIterations: 2
+  ShadowPenumbra: 1.1
+  AoStepsize: 4.67
+  AoIterations: 1
   AoIntensity: 0.271
   MainColor: {r: 1, g: 0, b: 0.93103456, a: 0}
   Sphere1: {x: 0, y: 0, z: 0, w: 4.15}
@@ -164,7 +164,8 @@ MonoBehaviour:
   BoxSphereSmooth: 0.51
   Sphere2: {x: 0, y: 0, z: 0, w: 2.29}
   SphereIntersectSmooth: -1
-  ModInterval: {x: 4, y: 4, z: 4}
+  TrianglePosition: {x: 0, y: 0, z: 0}
+  TriangleIterations: 3
 --- !u!81 &401051255
 AudioListener:
   m_ObjectHideFlags: 0

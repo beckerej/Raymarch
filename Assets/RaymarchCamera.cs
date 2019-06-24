@@ -67,6 +67,10 @@ namespace Assets
         public Vector4 Sphere2 = new Vector4(0f, 0f, 0f, 2.29f);
         public float SphereIntersectSmooth = -1f;
 
+        [Header("Sierpinski Triangle")]
+        public Vector3 TrianglePosition = new Vector3(0f,0f,0f);
+        public int TriangleIterations = 3;
+
         private void OnRenderImage(Texture source, RenderTexture destination)
         {
             if (!RaymarchMaterial)
@@ -94,6 +98,7 @@ namespace Assets
         {
             RaymarchMaterial.SetInt("_AoIterations", AoIterations);
             RaymarchMaterial.SetInt("_MaxIterations", MaxIterations);
+            RaymarchMaterial.SetInt("_TriangleIterations", TriangleIterations);
         }
 
         private void SetMaterialColors()
@@ -109,6 +114,7 @@ namespace Assets
             RaymarchMaterial.SetVector("_box1", Box);
             RaymarchMaterial.SetVector("_sphere2", Sphere2);
             RaymarchMaterial.SetVector("_ShadowDistance", ShadowDistance);
+            RaymarchMaterial.SetVector("_TrianglePosition", TrianglePosition);
         }
 
         private void SetMaterialMatrices()
@@ -129,7 +135,6 @@ namespace Assets
             RaymarchMaterial.SetFloat("_sphereIntersectSmooth", SphereIntersectSmooth);
             RaymarchMaterial.SetFloat("_AoStepsize", AoStepsize);
             RaymarchMaterial.SetFloat("_AoIntensity", AoIntensity);
-
         }
 
         private void DrawFrustum()
